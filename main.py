@@ -8,7 +8,7 @@ def read_root():
     return {"message": "Hello from Render + FastAPI!"}
 
 
-@app.get("/test_get/echo-number")
+@app.get("/test/echo-number")
 def echo_number(number: int = Query(..., description="숫자를 쿼리 파라미터로 전달하세요.")):
     return {
         "received_number": number,
@@ -18,7 +18,7 @@ def echo_number(number: int = Query(..., description="숫자를 쿼리 파라미
 class NumberInput(BaseModel):
     number: int
 
-@app.post("/test_post/echo-number")
+@app.post("/test/echo-number")
 def echo_number(data: NumberInput):
     return {
         "received_number": data.number,
