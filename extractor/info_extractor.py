@@ -13,12 +13,11 @@ llm = ChatOpenAI(
 def extract_card_info(conversation: str) -> dict:
     prompt = f"""
     다음은 사용자와 AI가 나눈 대화 요약입니다.
-    이 요약에서 명함에 필요한 정보를 추출해주세요.
+    이 요약에서 명함에 필요한 정보를 JSON 형식으로만 추출해주세요.
+    코드 블록(```json) 없이 순수한 JSON만 반환해주세요.
 
     대화 요약:
-    \"\"\"
     {conversation}
-    \"\"\"
 
     [JSON 출력 형식]
     {{
