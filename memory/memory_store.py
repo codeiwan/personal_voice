@@ -1,5 +1,5 @@
 from langchain.memory import ConversationSummaryMemory
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
 
