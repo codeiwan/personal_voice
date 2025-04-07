@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from routes import chat, analyze
+
 app = FastAPI()
 
 app.add_middleware(
@@ -33,3 +35,6 @@ def echo_number(data: NumberInput):
         "received_number": data.number,
         "message": "백엔드 POST test API가 제공한 숫자입니다."
     }
+
+app.include_router(chat.router)
+app.include_router(analyze.router)
