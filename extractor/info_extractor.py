@@ -21,7 +21,6 @@ def extract_card_info(conversation: str) -> dict:
 
     [JSON 출력 형식]
     {{
-    "이름": "",
     "직업": "",
     "직책": "",
     "전화번호": "",
