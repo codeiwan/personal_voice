@@ -3,6 +3,7 @@ uvicorn
 langchain
 langchain-openai
 openai
+pydub
 python-dotenv
 python-multipart
 librosa

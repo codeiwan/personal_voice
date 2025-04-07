@@ -5,17 +5,26 @@ import numpy as np
 import colorsys
 import soundfile as sf
 import io
+from utils.audio_convert import convert_webm_to_wav
+import os
 
 router = APIRouter()
 
 @router.post("/upload-audio")
 def upload_audio(file: UploadFile = File(...)):
     try:
-        audio_bytes = io.BytesIO(file.file.read())
-        y, sr = sf.read(audio_bytes)
+        audio_bytes = file.file.read()
+        file_ext = file.filename.split('.')[-1].lower()
 
-        if y.ndim > 1:
-            y = librosa.to_mono(y.T)
+        if file_ext == "webm":
+            tmp_wav_path = convert_webm_to_wav(audio_bytes)
+            y, sr = librosa.load(tmp_wav_path, sr=22050)
+            os.remove(tmp_wav_path)
+        else:
+            audio_io = io.BytesIO(audio_bytes)
+            y, sr = sf.read(audio_io)
+            if y.ndim > 1:
+                y = librosa.to_mono(y.T)
 
         y = librosa.util.normalize(y)
         y, _ = librosa.effects.trim(y)
