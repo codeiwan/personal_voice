@@ -1,10 +1,12 @@
 import os
-from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import ConversationChain
-from memory.memory_store import get_memory
-from memory.info_memory_store import get_info_memory
+
 from dotenv import load_dotenv
+from langchain.chains import ConversationChain
+from langchain.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+
+from memory.info_memory_store import get_info_memory
+from memory.memory_store import get_memory
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

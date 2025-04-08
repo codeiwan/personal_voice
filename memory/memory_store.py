@@ -1,7 +1,8 @@
+import os
+
+from dotenv import load_dotenv
 from langchain.memory import ConversationSummaryMemory
 from langchain_openai import ChatOpenAI
-from dotenv import load_dotenv
-import os
 
 load_dotenv()
 

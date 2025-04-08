@@ -1,14 +1,17 @@
-from memory.info_memory_store import memory_dict
-from extractor.info_extractor import extract_card_info
+import io
+
 from fastapi import APIRouter, UploadFile, File, Query
 from fastapi.responses import JSONResponse
-from utils.stt import speech_to_text
-from models.schemas import ChatResponse, ChatRequest
+
 from chains.chat_chain import get_info_conversation_chain
-import io
+from extractor.info_extractor import extract_card_info
+from memory.info_memory_store import memory_dict
+from models.schemas import ChatRequest, ChatResponse
+from utils.stt import speech_to_text
 
 router = APIRouter()
 
+# STT 변환
 @router.post("/stt")
 async def stt(file: UploadFile = File(...)):
     try:
@@ -22,12 +25,14 @@ async def stt(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+# 사용자 정보 기반 LLM 상호작용
 @router.post("/info-chat", response_model=ChatResponse)
 def info_chat(req: ChatRequest):
     chain = get_info_conversation_chain(req.user_id)
     result = chain.run(req.message)
     return ChatResponse(response=result)
 
+# 사용자 정보 추출
 @router.get("/extract-info")
 def extract_info(user_id: str = Query(...)):
     if user_id not in memory_dict:

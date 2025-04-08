@@ -1,15 +1,18 @@
-from fastapi import APIRouter, UploadFile, File
-from fastapi.responses import JSONResponse
+import io
+import os
+
+import colorsys
 import librosa
 import numpy as np
-import colorsys
 import soundfile as sf
-import io
+from fastapi import APIRouter, UploadFile, File
+from fastapi.responses import JSONResponse
+
 from utils.audio_convert import convert_webm_to_wav
-import os
 
 router = APIRouter()
 
+# 사용자 음성 기반 목소리 색상 추출
 @router.post("/upload-audio")
 def upload_audio(file: UploadFile = File(...)):
     try:
