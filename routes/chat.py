@@ -9,6 +9,7 @@ from extractor.info_extractor import extract_card_info, is_info_complete
 from memory.info_memory_store import memory_dict
 from models.schemas import ChatRequest, ChatResponse
 from utils.stt import speech_to_text
+from utils.text_normalizer import normalize_email_phrases
 
 router = APIRouter()
 
@@ -22,6 +23,7 @@ async def stt(file: UploadFile = File(...)):
         audio_io.name = file.filename
 
         text_result = speech_to_text(audio_io)
+        text_result = normalize_email_phrases(text_result)
         return JSONResponse(content={"text": text_result}, status_code=200)
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
