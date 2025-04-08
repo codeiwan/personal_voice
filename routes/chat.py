@@ -2,9 +2,10 @@ import io
 
 from fastapi import APIRouter, UploadFile, File, Query
 from fastapi.responses import JSONResponse
+from langchain.schema import HumanMessage, AIMessage
 
 from chains.chat_chain import get_info_conversation_chain
-from extractor.info_extractor import extract_card_info
+from extractor.info_extractor import extract_card_info, is_info_complete
 from memory.info_memory_store import memory_dict
 from models.schemas import ChatRequest, ChatResponse
 from utils.stt import speech_to_text
@@ -30,6 +31,19 @@ async def stt(file: UploadFile = File(...)):
 def info_chat(req: ChatRequest):
     chain = get_info_conversation_chain(req.user_id)
     result = chain.run(req.message)
+
+    memory = memory_dict[req.user_id]
+    conversation = "\n".join(
+        f"{'USER' if isinstance(m, HumanMessage) else 'AI'}: {m.content}" 
+        for m in memory.chat_memory.messages
+    )
+
+    info = extract_card_info(conversation)
+    finished = is_info_complete(info)
+    if finished:
+        final_message = "모든 정보를 수집했습니다. 감사합니다. 이제 명함 제작을 시작할 수 있어요!"
+        return ChatResponse(response=final_message, finished=True)
+
     return ChatResponse(response=result)
 
 # 사용자 정보 추출
@@ -39,7 +53,10 @@ def extract_info(user_id: str = Query(...)):
         return JSONResponse(content={"error": "대화 기록이 없습니다."}, status_code=404)
     
     memory = memory_dict[user_id]
-    summary = memory.buffer
+    conversation = "\n".join(
+        f"{'USER' if isinstance(m, HumanMessage) else 'AI'}: {m.content}"
+        for m in memory.chat_memory.messages
+    )
 
-    info = extract_card_info(summary)
+    info = extract_card_info(conversation)
     return JSONResponse(content=info)
