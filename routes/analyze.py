@@ -35,11 +35,22 @@ def upload_audio(file: UploadFile = File(...)):
         y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
         sr = target_sr
 
-        pitch = np.median(librosa.yin(y, fmin=80, fmax=300, sr=sr, frame_length=2048, center=False))
+        analysis_fmin = 100
+        analysis_fmax = 250
+
+        pitch = np.median(librosa.yin(
+            y,
+            fmin=analysis_fmin,
+            fmax=analysis_fmax,
+            sr=sr,
+            frame_length=2048,
+            center=False
+            ))
+        
         energy = np.mean(librosa.feature.rms(y=y))
         jitter = np.std(librosa.zero_crossings(y, pad=False))
 
-        hue = (float(pitch) - 80) / (300 - 80) * 360
+        hue = (float(pitch) - analysis_fmin) / (analysis_fmax - analysis_fmin) * 360
         saturation = max(0.2, min(1.0, float(energy) * 100))
         value = max(0.3, 1.0 - min(0.7, float(jitter) * 2))
 
