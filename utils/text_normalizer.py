@@ -29,6 +29,7 @@ def normalize_email_phrases(text: str) -> str:
             "카카오": "kakao",
             "핫메일": "hotmail",
             "넷": "net",
+            "골뱅이": "@",
             "golbaengi": "@",
             "고병이": "@"
         }
