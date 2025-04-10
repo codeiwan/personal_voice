@@ -4,8 +4,8 @@ import re
 def contains_email_context(text: str) -> bool:
     EMAIL_HINTS = [
         "이메일", "메일", "메일 주소", "전자우편",
-        "골뱅이", "@", "닷컴", "점컴", "점콤", "닷 콤",
-        "com", "net", "org", "co.kr",
+        "골뱅이", "고병이", "@", "닷컴", "점컴", "점콤", "닷 콤",
+        "com", "net", "org", "co.kr", ".com",
         "gmail", "naver", "daum", "hotmail", "kakao",
         "엣", "컴", "닷넷", "닷 넷",
         "golbaengi ", "golbaengi", 
@@ -29,7 +29,8 @@ def normalize_email_phrases(text: str) -> str:
             "카카오": "kakao",
             "핫메일": "hotmail",
             "넷": "net",
-            "golbaengi": "@"
+            "golbaengi": "@",
+            "고병이": "@"
         }
 
         for kor, eng in domain_map.items():
