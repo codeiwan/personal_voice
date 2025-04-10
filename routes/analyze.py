@@ -52,7 +52,10 @@ def upload_audio(file: UploadFile = File(...)):
 
         hue = (float(pitch) - analysis_fmin) / (analysis_fmax - analysis_fmin) * 360
         saturation = max(0.2, min(1.0, float(energy) * 100))
-        value = max(0.3, 1.0 - min(0.7, float(jitter) * 2))
+
+        base_value = 0.7  # 기본 밝기 기준 올림
+        jitter_penalty = min(0.4, float(jitter) * 1.5)
+        value = max(0.5, base_value + (0.4 - jitter_penalty))  # 색의 밝기
 
         r, g, b = colorsys.hsv_to_rgb(hue / 360, saturation, value)
         hex_color = '#{:02X}{:02X}{:02X}'.format(int(r * 255), int(g * 255), int(b * 255))
