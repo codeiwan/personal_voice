@@ -6,7 +6,8 @@ from langchain.schema import HumanMessage, AIMessage
 
 from chains.chat_chain import get_info_conversation_chain
 from extractor.info_extractor import extract_card_info, is_info_complete
-from memory.info_memory_store import memory_dict
+from memory.memory_store import memory_dict
+from memory.info_memory_store import memory_dict as info_memory_dict
 from models.schemas import ChatRequest, ChatResponse
 from utils.stt import speech_to_text
 from utils.text_normalizer import normalize_email_phrases
@@ -34,7 +35,7 @@ def info_chat(req: ChatRequest):
     chain = get_info_conversation_chain(req.user_id)
     result = chain.run(req.message)
 
-    memory = memory_dict[req.user_id]
+    memory = info_memory_dict[req.user_id]
     conversation = "\n".join(
         f"{'USER' if isinstance(m, HumanMessage) else 'AI'}: {m.content}" 
         for m in memory.chat_memory.messages
@@ -51,10 +52,10 @@ def info_chat(req: ChatRequest):
 # 사용자 정보 추출
 @router.get("/extract-info")
 def extract_info(user_id: str = Query(...)):
-    if user_id not in memory_dict:
+    if user_id not in info_memory_dict:
         return JSONResponse(content={"error": "대화 기록이 없습니다."}, status_code=404)
     
-    memory = memory_dict[user_id]
+    memory = info_memory_dict[user_id]
     conversation = "\n".join(
         f"{'USER' if isinstance(m, HumanMessage) else 'AI'}: {m.content}"
         for m in memory.chat_memory.messages
@@ -62,3 +63,14 @@ def extract_info(user_id: str = Query(...)):
 
     info = extract_card_info(conversation)
     return JSONResponse(content=info)
+
+# 사용자 정보 제거
+@router.delete("/reset-memory")
+def reset_memory(user_id: str = Query(...)):
+    removed_general = memory_dict.pop(user_id, None)
+    removed_info = info_memory_dict.pop(user_id, None)
+
+    if removed_general or removed_info:
+        return JSONResponse(content={"message": f"{user_id}님의 대화 기록이 초기화되었습니다."})
+    else:
+        return JSONResponse(content={"message": f"{user_id}님에 대한 기록이 존재하지 않습니다."}, status_code=404)
